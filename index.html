@@ -1,0 +1,249 @@
+
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Demo – Dra. Camila Duarte Freire</title>
+  <meta name="description" content="LP demo – consultas e procedimentos odontológicos com WhatsApp direto." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+  </style>
+</head>
+<body class="bg-neutral-950 text-white">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const CLINIC_NAME = "Dra. Camila Duarte Freire";
+    const TAGLINE = "Motivos para sorrir mais";
+    const PROFESSIONAL_NAME = "Dra. Camila Duarte Freire";
+    const PROFESSIONAL_CRO = "CRO RJ 40211";
+    const CITY = "Tijuca • Rio de Janeiro/RJ";
+    const ADDRESS = "Praça Saens Peña, 166 – Tijuca";
+    const WHATSAPP_NUMBER = "5521991664093";
+    const SERVICES = [
+      { name: "Lentes de Resina", desc: "Harmonia do sorriso com técnica minimamente invasiva." },
+      { name: "Ortodontia / Invisalign", desc: "Alinhamento dental com conforto e previsibilidade." },
+      { name: "Lipo de Papada", desc: "Definição do contorno facial com protocolo seguro." },
+      { name: "Toxina Botulínica", desc: "Indicações estéticas e terapêuticas sob avaliação clínica." }
+    ];
+    const HERO_IMG = "./hero_dra_camila_1200x900.jpg";
+
+    function openWhatsApp(msg) {
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+      window.open(url, "_blank");
+    }
+    function Label({ children }) { return <label className="text-sm font-medium text-gray-200 mb-1 block">{children}</label>; }
+    function Input(props){ return <input {...props} className={"w-full rounded-xl bg-black/40 border border-white/10 px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-400/60 "+(props.className||"")} /> }
+    function Textarea(props){ return <textarea {...props} className={"w-full rounded-xl bg-black/40 border border-white/10 px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-400/60 min-h-[110px] "+(props.className||"")} /> }
+    function PrimaryButton({children,onClick,type="button"}){ return <button type={type} onClick={onClick} className="w-full rounded-2xl bg-gradient-to-b from-emerald-300 to-emerald-600 text-black font-semibold tracking-wide shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] hover:brightness-110 active:scale-[.99] transition px-6 py-3">{children}</button> }
+    function GhostButton({children,onClick}){ return <button onClick={onClick} className="w-full rounded-2xl border border-emerald-500/60 text-emerald-300 font-medium hover:bg-emerald-500/10 transition px-6 py-3">{children}</button> }
+
+    function Modal({ open, onClose, title, children }){
+      if(!open) return null;
+      return (
+        <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/70">
+          <div className="w-full max-w-lg rounded-3xl bg-neutral-900 border border-white/10 shadow-2xl">
+            <div className="flex items-center justify-between p-5 border-b border-white/10">
+              <h3 className="text-lg font-semibold text-white">{title}</h3>
+              <button onClick={onClose} className="text-white/70 hover:text-white">✕</button>
+            </div>
+            <div className="p-5">{children}</div>
+          </div>
+        </div>
+      );
+    }
+
+    function LeadForm({ defaultMsg }){
+      const [name,setName] = React.useState("");
+      const [whats,setWhats] = React.useState("");
+      const [interest,setInterest] = React.useState("");
+      const [note,setNote] = React.useState("");
+      const msg = React.useMemo(()=>`${defaultMsg}\n\nNome: ${name}\nWhatsApp: ${whats}\nInteresse: ${interest}\nObservações: ${note}`,[defaultMsg,name,whats,interest,note]);
+      return (
+        <form onSubmit={(e)=>{e.preventDefault(); openWhatsApp(msg);}} className="space-y-4">
+          <div>
+            <Label>Nome</Label>
+            <Input required value={name} onChange={e=>setName(e.target.value)} placeholder="Seu nome" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label>WhatsApp</Label>
+              <Input required value={whats} onChange={e=>setWhats(e.target.value)} placeholder="(21) 9 9999-9999" />
+            </div>
+            <div>
+              <Label>Interesse</Label>
+              <Input value={interest} onChange={e=>setInterest(e.target.value)} placeholder="Ex.: Lentes, Ortodontia, Lipo de papada" />
+            </div>
+          </div>
+          <div>
+            <Label>Observações</Label>
+            <Textarea value={note} onChange={e=>setNote(e.target.value)} placeholder="Preferência de data/horário, dúvidas, etc." />
+          </div>
+          <PrimaryButton type="submit">Falar no WhatsApp</PrimaryButton>
+          <p className="text-xs text-white/50">Ao continuar, você concorda em receber contato por WhatsApp.</p>
+        </form>
+      );
+    }
+
+    function App(){
+      const [modal,setModal] = React.useState(null); // "consulta" | "infos"
+      const bg = "before:absolute before:inset-0 before:bg-[radial-gradient(#ffffff0d_1px,transparent_1px)] before:[background-size:20px_20px] before:opacity-50 before:pointer-events-none";
+
+      return (
+        <div className={\`min-h-screen bg-neutral-950 text-white \${bg}\`}>
+          {/* NAV */}
+          <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-neutral-950/60 border-b border-white/10">
+            <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-4">
+              <div className="leading-tight">
+                <p className="text-sm text-white/70">{CITY}</p>
+                <p className="font-semibold tracking-wide">{CLINIC_NAME}</p>
+              </div>
+              <div className="ml-auto hidden md:flex gap-3">
+                <GhostButton onClick={()=>setModal("consulta")}>Consulta</GhostButton>
+              </div>
+              <div className="ml-auto md:ml-0">
+                <PrimaryButton onClick={()=>setModal("infos")}>Receber Informações</PrimaryButton>
+              </div>
+            </div>
+          </header>
+
+          {/* HERO */}
+          <section className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 px-4 pt-10 pb-6">
+            <div className="order-2 md:order-1 flex flex-col justify-center">
+              <h1 className="text-3xl md:text-5xl font-bold leading-tight">{TAGLINE}</h1>
+              <p className="mt-4 text-lg text-white/80">Ortodontia, Invisalign, Lentes de Resina e Harmonização facial com acolhimento e segurança.</p>
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <PrimaryButton onClick={()=>setModal("consulta")}>Quero Consulta</PrimaryButton>
+                <PrimaryButton onClick={()=>setModal("infos")}>Falar com a Equipe</PrimaryButton>
+              </div>
+              <p className="mt-3 text-xs text-white/50">Agenda limitada • Prioridade por ordem de contato</p>
+            </div>
+            <div className="order-1 md:order-2">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-white/10">
+                <img src={HERO_IMG} alt="Clínica – Hero" className="h-full w-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent" />
+              </div>
+            </div>
+          </section>
+
+          {/* SERVIÇOS */}
+          <section className="max-w-6xl mx-auto px-4 py-10">
+            <h2 className="text-2xl md:text-3xl font-semibold">Serviços em destaque</h2>
+            <div className="mt-5 grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {SERVICES.map((s,i)=> (
+                <div key={i} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-b from-emerald-300 to-emerald-600 mb-3" />
+                  <p className="font-medium">{s.name}</p>
+                  <p className="text-white/70 text-sm mt-1">{s.desc}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* RESULTADOS & EDUCATIVO */}
+          <section className="max-w-6xl mx-auto px-4 pb-12">
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-10">
+              <h2 className="text-2xl md:text-3xl font-semibold">Resultados & Depoimentos</h2>
+              <p className="mt-2 text-white/70">Provas em texto e depoimentos. Conteúdo educativo. Sem promessas de resultado.</p>
+
+              {/* RESULTADOS DE CASOS (educativo) */}
+              <details className="mt-5 group"> 
+                <summary className="cursor-pointer select-none inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-black/40 px-4 py-2 text-white/90 hover:bg-white/10">
+                  <span className="text-sm font-semibold">Ver casos clínicos</span>
+                  <span className="text-xs text-white/60">(galeria oculta por padrão)</span>
+                </summary>
+                <div className="mt-5">
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[1,2,3].map(i=> (
+                      <figure key={i} className="rounded-2xl overflow-hidden border border-white/10 bg-black/50">
+                        <div className="aspect-[4/3] grid grid-cols-2">
+                          <div className="relative border-r border-white/10">
+                            <img src={`https://placehold.co/600x450?text=Antes+${i}`} alt={`Antes ${i}`} className="w-full h-full object-cover" />
+                            <figcaption className="absolute top-2 left-2 text-xs bg-black/60 px-2 py-1 rounded-md">Antes</figcaption>
+                          </div>
+                          <div className="relative">
+                            <img src={`https://placehold.co/600x450?text=Depois+${i}`} alt={`Depois ${i}`} className="w-full h-full object-cover" />
+                            <figcaption className="absolute top-2 left-2 text-xs bg-black/60 px-2 py-1 rounded-md">Depois</figcaption>
+                          </div>
+                        </div>
+                      </figure>
+                    ))}
+                  </div>
+
+                  <div className="mt-6 text-xs text-white/60 space-y-1">
+                    <p><strong>Responsável técnico:</strong> {PROFESSIONAL_NAME} – {PROFESSIONAL_CRO}</p>
+                    <p>Imagens publicadas com autorização expressa (TCLE). Conteúdo informativo, sem caráter sensacionalista. Não constitui promessa de resultado. Em caso de dúvidas clínicas, agende avaliação.</p>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </section>
+
+          {/* FAQ */}
+          <section className="max-w-6xl mx-auto px-4 pb-16">
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-10">
+              <h2 className="text-2xl md:text-3xl font-semibold">Perguntas frequentes</h2>
+              <div className="mt-4 grid md:grid-cols-2 gap-6 text-white/80">
+                <div>
+                  <p className="font-medium">É diagnóstico online?</p>
+                  <p className="text-sm mt-1">Não. Orientamos e explicamos o processo. O plano é definido após avaliação presencial.</p>
+                </div>
+                <div>
+                  <p className="font-medium">Quanto tempo leva?</p>
+                  <p className="text-sm mt-1">Depende do caso. Explicamos o passo a passo e indicamos o melhor protocolo para você.</p>
+                </div>
+                <div>
+                  <p className="font-medium">Tem parcelamento?</p>
+                  <p className="text-sm mt-1">Sim, apresentamos as condições no atendimento após avaliação.</p>
+                </div>
+                <div>
+                  <p className="font-medium">Quem é o responsável técnico?</p>
+                  <p className="text-sm mt-1">{PROFESSIONAL_NAME} • {PROFESSIONAL_CRO}</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* FOOTER */}
+          <footer className="border-t border-white/10 py-8">
+            <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-3 gap-4 text-white/70">
+              <div>
+                <p className="font-semibold text-white">{CLINIC_NAME}</p>
+                <p className="text-sm">{CITY}</p>
+                <p className="text-sm">{ADDRESS}</p>
+              </div>
+              <div>
+                <p className="text-sm">Atendimento por agendamento • Entre em contato pelo WhatsApp.</p>
+                <button onClick={()=>openWhatsApp("Olá! Tenho interesse nos tratamentos.")} className="mt-2 text-emerald-300 underline">Falar no WhatsApp</button>
+              </div>
+              <div className="text-xs md:text-right">
+                <p>Conteúdo educativo. Resultados variam conforme avaliação clínica.</p>
+                <p>© {new Date().getFullYear()} {CLINIC_NAME}</p>
+              </div>
+            </div>
+          </footer>
+
+          {/* MODAIS */}
+          <Modal open={modal==="consulta"} onClose={()=>setModal(null)} title="Quero Consulta">
+            <LeadForm defaultMsg={\`Olá! Tenho interesse em consulta com ${PROFESSIONAL_NAME}.\`} />
+          </Modal>
+          <Modal open={modal==="infos"} onClose={()=>setModal(null)} title="Receber Informações">
+            <LeadForm defaultMsg={\`Olá! Quero receber informações e melhores horários.\`} />
+          </Modal>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
